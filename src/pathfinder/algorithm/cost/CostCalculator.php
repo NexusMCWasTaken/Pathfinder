@@ -1,31 +1,37 @@
 <?php
+/*
+ * Copyright (c) Matze997
+ * All rights reserved.
+ * Under GPL license
+ */
+
 declare(strict_types=1);
+
 namespace pathfinder\algorithm\cost;
+
 use pocketmine\block\Block;
 
+abstract class CostCalculator {
+    public function __construct(){
+        $this->registerBlocks();
+    }
 
-abstract class CostCalculator{
-	protected static array $BLOCK_COSTS = [];
+    public function registerBlocks(): void {}
 
-	public function __construct(){
-		$this->registerBlocks();
-	}
+    protected function register(Block $block, int $cost, bool $allStates = true): void {
+        if($allStates) {
+            for($meta = 0; $meta <= 15; $meta++) {
+                $fullId = ($block->getId() << Block::INTERNAL_METADATA_BITS) | $meta;
+                self::$BLOCK_COSTS[$fullId] = $cost;
+            }
+            return;
+        }
+        self::$BLOCK_COSTS[$block->getFullId()] = $cost;
+    }
 
-	public function registerBlocks(): void{
-	}
+    protected static array $BLOCK_COSTS = [];
 
-	public static function getCost(Block $block): int{
-		return self::$BLOCK_COSTS[$block->getFullId()] ?? 1;
-	}
-
-	protected function register(Block $block, int $cost, bool $allStates = true): void{
-		if ($allStates) {
-			for ($meta = 0; $meta <= 15; $meta++) {
-				$fullId = ($block->getId() << Block::INTERNAL_METADATA_BITS) | $meta;
-				self::$BLOCK_COSTS[$fullId] = $cost;
-			}
-			return;
-		}
-		self::$BLOCK_COSTS[$block->getFullId()] = $cost;
-	}
+    public static function getCost(Block $block): int {
+        return self::$BLOCK_COSTS[$block->getFullId()] ?? 1;
+    }
 }
