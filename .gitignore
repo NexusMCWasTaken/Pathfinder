@@ -1,5 +1,5 @@
-.idea/runConfigurations/
-.idea/workspace.xml
+.idea/*
+!.idea/copyright/
 /vendor/
 build.php
 out/
